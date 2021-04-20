@@ -1,14 +1,15 @@
+/.idea/
 *.class
 target
 /bin/
 /.settings/
 .project
 .classpath
+hello.iml
 
 # Package Files
 *.jar
 *.war
 *.ear
-
 # Serverless directories
 .serverless
