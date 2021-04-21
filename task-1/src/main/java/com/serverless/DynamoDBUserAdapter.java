@@ -19,8 +19,6 @@ import java.util.logging.Logger;
 public class DynamoDBUserAdapter {
     private static DynamoDBUserAdapter INSTANCE;
 
-    private Logger logger = Logger.getLogger(getClass().getName());
-
     public static DynamoDBUserAdapter getInstance() {
         if (INSTANCE == null)
             INSTANCE = new DynamoDBUserAdapter();

@@ -1,6 +1,8 @@
 service: serverless-task-1
 custom:
   usersTableName: 'Users'
+  bucket: 'aishchenko-test'
+  QueueName: "userFiles"
 
 provider:
   name: aws
@@ -12,41 +14,51 @@ provider:
     - Effect: "Allow"
       Action:
         - "dynamodb:*"
+        - "s3:GetObject"
+        - "sqs:SendMessage"
       Resource: "*"
   environment:
     USERS_TABLE_NAME: ${self:custom.usersTableName}
+    SQS_QUEUE_URL: !Ref myQueue
 
 package:
   artifact: target/task1-dev.jar
 
 functions:
   fetch:
-    handler: com.serverless.ListUserHandler
+    handler: com.serverless.handlers.rest.ListUserHandler
     events:
       - http:
           method: GET
           path: /users
 
   fetchById:
-    handler: com.serverless.GetUserHandler
+    handler: com.serverless.handlers.rest.GetUserHandler
     events:
       - http:
           method: GET
           path: /users/{id}
 
   add:
-    handler: com.serverless.CreateUserHandler
+    handler: com.serverless.handlers.rest.CreateUserHandler
     events:
       - http:
           method: POST
           path: /users
 
   delete:
-    handler: com.serverless.DeleteUserHandler
+    handler: com.serverless.handlers.rest.DeleteUserHandler
     events:
       - http:
           method: DELETE
           path: /users/{id}
+
+  s3EventHandler:
+    handler: com.serverless.handlers.s3.S3EventHandler
+    events:
+      - s3:
+          bucket: ${self:custom.bucket}
+          event: s3:ObjectCreated:*
 
 resources:
   Resources:
@@ -67,3 +79,7 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
+    myQueue:
+      Type: "AWS::SQS::Queue"
+      Properties:
+        QueueName: ${self:custom.QueueName}
