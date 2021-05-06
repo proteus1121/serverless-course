@@ -1,0 +1,48 @@
+service: api-dynamodb-service
+provider:
+  name: aws
+  runtime: java8
+  region: us-east-1
+  timeout: 10
+  memorySize: 1024
+  iamRoleStatements:
+    - ${file(../serverless.common.yml):lambdaPolicyXRay}
+    - Effect: "Allow"
+      Action:
+        - "dynamodb:*"
+      Resource: "*"
+  environment:
+    USERS_TABLE_NAME:
+      "Fn::ImportValue": "user-serverless-table-${self:provider.stage}"
+
+package:
+  artifact: target/dynamodb-service-dev.jar
+
+functions:
+  fetch:
+    handler: com.serverless.handlers.rest.ListUserHandler
+    events:
+      - http:
+          method: GET
+          path: /users
+
+  fetchById:
+    handler: com.serverless.handlers.rest.GetUserHandler
+    events:
+      - http:
+          method: GET
+          path: /users/{id}
+
+  add:
+    handler: com.serverless.handlers.rest.CreateUserHandler
+    events:
+      - http:
+          method: POST
+          path: /users
+
+  delete:
+    handler: com.serverless.handlers.rest.DeleteUserHandler
+    events:
+      - http:
+          method: DELETE
+          path: /users/{id}

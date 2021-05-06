@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/api-dynamodb-service/api-dynamodb-service.iml" filepath="$PROJECT_DIR$/api-dynamodb-service/api-dynamodb-service.iml" />
+      <module fileurl="file://$PROJECT_DIR$/common/common.iml" filepath="$PROJECT_DIR$/common/common.iml" />
+      <module fileurl="file://$PROJECT_DIR$/s3-sqs-service/s3-sqs-service.iml" filepath="$PROJECT_DIR$/s3-sqs-service/s3-sqs-service.iml" />
+      <module fileurl="file://$PROJECT_DIR$/sqs-dynamodb-service/sqs-dynamodb-service.iml" filepath="$PROJECT_DIR$/sqs-dynamodb-service/sqs-dynamodb-service.iml" />
+      <module fileurl="file://$PROJECT_DIR$/task2.iml" filepath="$PROJECT_DIR$/task2.iml" />
+    </modules>
+  </component>
+</project>

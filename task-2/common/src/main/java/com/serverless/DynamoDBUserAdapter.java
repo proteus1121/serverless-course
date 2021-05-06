@@ -14,6 +14,7 @@ import com.serverless.models.User;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 public class DynamoDBUserAdapter {
     private static DynamoDBUserAdapter INSTANCE;
@@ -25,20 +26,32 @@ public class DynamoDBUserAdapter {
         return INSTANCE;
     }
 
+    private Logger logger = Logger.getLogger(getClass().getName());
+
     private final DynamoDBMapper mapper;
 
     private DynamoDBUserAdapter() {
-        String tableName = System.getenv("USERS_TABLE_NAME");
-        AmazonDynamoDB database = AmazonDynamoDBClientBuilder.standard()
-                .withRegion(Regions.US_EAST_1)
-                .build();
-        DynamoDBMapperConfig mapperConfig = DynamoDBMapperConfig.builder()
-                .withTableNameOverride(new DynamoDBMapperConfig.TableNameOverride(tableName))
-                .build();
-        this.mapper = new DynamoDBMapper(database, mapperConfig);
+        try {
+            String tableName = System.getenv("USERS_TABLE_NAME");
+            logger.info("Table name : " + tableName);
+            AmazonDynamoDB database = AmazonDynamoDBClientBuilder.standard()
+                    .withRegion(Regions.US_EAST_1)
+                    .build();
+            logger.info("database name : " + database.toString());
+            DynamoDBMapperConfig mapperConfig = DynamoDBMapperConfig.builder()
+                    .withTableNameOverride(new DynamoDBMapperConfig.TableNameOverride(tableName))
+                    .build();
+            logger.info("config name : " + mapperConfig.toString());
+            this.mapper = new DynamoDBMapper(database, mapperConfig);
+            logger.info("mapper name : " + mapper.toString());
+        } catch (Exception e) {
+            logger.warning(e.toString());
+            throw new RuntimeException();
+        }
     }
 
     public void createUser(String userName) {
+        logger.info("Saving user: " + userName);
         User user = new User(userName);
         this.mapper.save(user);
     }

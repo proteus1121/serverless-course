@@ -13,3 +13,5 @@ hello.iml
 *.ear
 # Serverless directories
 .serverless
+/task-1/.idea/
+/task-2/.idea/

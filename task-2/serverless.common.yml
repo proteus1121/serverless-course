@@ -1,0 +1,10 @@
+lambdaPolicyXRay:
+  Effect: Allow
+  Action:
+    - xray:PutTraceSegments
+    - xray:PutTelemetryRecords
+  Resource: "*"
+custom:
+  usersTableName: 'Users'
+  bucket: 'aishchenko-test'
+  queueName: "userFiles"

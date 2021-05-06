@@ -1,0 +1,39 @@
+service: sqs-dynamodb-service
+provider:
+  name: aws
+  runtime: java8
+  region: us-east-1
+  timeout: 10
+  memorySize: 1024
+  tracing:
+    lambda: true
+  iamRoleStatements:
+    - ${file(../serverless.common.yml):lambdaPolicyXRay}
+    - Effect: "Allow"
+      Action:
+        - "dynamodb:*"
+        - "s3:GetObject"
+        - "sqs:SendMessage"
+      Resource: "*"
+  environment:
+    USERS_TABLE_NAME:
+      "Fn::ImportValue": "user-serverless-table-${self:provider.stage}"
+
+package:
+  artifact: target/sqs-dynamodb-service-dev.jar
+
+functions:
+  fetch:
+    handler: com.serverless.handlers.sqs.CreateUserHandler
+    events:
+      - sqs:
+          arn:
+            Fn::Join:
+              - ":"
+              - - arn
+                - aws
+                - sqs
+                - Ref: AWS::Region
+                - Ref: AWS::AccountId
+                - ${file(../serverless.common.yml):custom.queueName}
+          batchSize: 1

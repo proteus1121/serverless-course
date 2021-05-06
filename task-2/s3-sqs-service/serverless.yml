@@ -1,0 +1,32 @@
+service: s3-sqs-service
+provider:
+  name: aws
+  runtime: java8
+  region: us-east-1
+  timeout: 10
+  memorySize: 1024
+  iamRoleStatements:
+    - ${file(../serverless.common.yml):lambdaPolicyXRay}
+    - Effect: "Allow"
+      Action:
+        - "s3:GetObject"
+        - "sqs:SendMessage"
+      Resource: "*"
+  environment:
+    USERS_TABLE_NAME:
+      "Fn::ImportValue": "user-serverless-table-${self:provider.stage}"
+    SQS_QUEUE_URL:
+      "Fn::ImportValue": "user-serverless-queue-${self:provider.stage}"
+
+package:
+  artifact: target/sqs-service-dev.jar
+
+functions:
+  s3EventHandler:
+    handler: com.serverless.handlers.s3.S3EventHandler
+    events:
+      - s3:
+          bucket: ${file(../serverless.common.yml):custom.bucket}
+          event: s3:ObjectCreated:*
+          rules:
+            - suffix: .json

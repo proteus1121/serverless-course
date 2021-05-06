@@ -1,0 +1,50 @@
+service: serverless-resources
+provider:
+  name: aws
+  runtime: java8
+  region: us-east-1
+  timeout: 10
+  memorySize: 1024
+  iamRoleStatements:
+    - ${file(../serverless.common.yml):lambdaPolicyXRay}
+    - Effect: "Allow"
+      Action:
+        - "dynamodb:*"
+        - "s3:GetObject"
+        - "sqs:SendMessage"
+      Resource: "*"
+
+resources:
+  Resources:
+    userTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${file(../serverless.common.yml):custom.usersTableName}
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+          - AttributeName: name
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+          - AttributeName: name
+            KeyType: RANGE
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+    userQueue:
+      Type: "AWS::SQS::Queue"
+      Properties:
+        QueueName: ${file(../serverless.common.yml):custom.queueName}
+  Outputs:
+    S3Queue:
+      Value:
+        "Ref": userQueue
+      Export:
+        Name: user-serverless-queue-${self:provider.stage}
+    DynamoDbTable:
+      Value:
+        "Ref": userTable
+      Export:
+        Name: user-serverless-table-${self:provider.stage}
